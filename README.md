@@ -92,3 +92,30 @@ Useful frontend routes:
 - `/admin/merge-review` — manual dedup/merge review placeholder.
 
 The frontend remains fixture-safe: it does not scrape platforms, bypass login, connect to platform accounts, render a built-in reader, or treat coupon expected prices as confirmed prices.
+
+## Mock crawler
+
+Task 7 adds a fixture-only mock crawler adapter system. It does **not** implement production crawling and does **not** connect to Naver Webtoon, KakaoPage, Ridi, or any external platform.
+
+Run the mock crawler:
+
+```bash
+make crawl-mock
+```
+
+Equivalent direct command:
+
+```bash
+python services/crawler/run_mock_crawl.py
+```
+
+The command reads `packages/fixtures/works.json`, `offers.json`, `promotions.json`, and `coupons.json`; calculates prices with the existing pricing module; detects changes against the previous snapshot; and writes local JSON records under `.local/crawl-state`.
+
+Generated local files:
+
+- `snapshot.json`
+- `price_history.json`
+- `crawl_logs.json`
+- `notification_events.json`
+
+`.local/` is ignored by Git. Live database writes are intentionally not required for the MVP; future DB integration must be optional behind `DATABASE_URL`. Production scraping remains out of scope until `docs/CRAWLER_POLICY.md` is reviewed.

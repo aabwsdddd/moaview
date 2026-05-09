@@ -420,3 +420,118 @@ Apply it to a local Supabase/Postgres database with `psql` available by setting 
 ```bash
 make seed
 ```
+
+## Mock crawler local record contract
+
+The mock crawler is not an HTTP API and does not scrape production platforms. It is a fixture-only job invoked with `make crawl-mock` or `python services/crawler/run_mock_crawl.py`. By default it writes generated JSON files to `.local/crawl-state`.
+
+### `snapshot.json`
+
+```json
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-09T00:00:00Z",
+  "database_url_present": false,
+  "offers": {
+    "offer_kakao_moonlight": {
+      "offer": {
+        "id": "offer_kakao_moonlight",
+        "work_id": "work_moonlight_archive",
+        "platform": "카카오페이지",
+        "platform_work_id": "kakaopage:work_moonlight_archive",
+        "base_price_krw": 400,
+        "free_episode_count": 7,
+        "wait_free_available": true,
+        "source_url": "https://example.com/kakao/moonlight-archive",
+        "last_verified_at": "2026-05-01T09:10:00Z"
+      },
+      "calculated_price": {
+        "base_price": 400,
+        "instant_discounted_price": 360,
+        "coupon_expected_price": 324,
+        "cashback_adjusted_price": null,
+        "effective_price_for_sort": 324,
+        "price_confidence": "estimated",
+        "calculation_note": "Coupon price is expected because coupon terms require user action or issuance.",
+        "applied_promotion_ids": ["promo_kakao_10_percent_auto"],
+        "applied_coupon_ids": ["coupon_kakao_code_fixture"],
+        "calculated_at": "2026-05-01T09:10:00Z"
+      },
+      "promotion_ids": ["promo_kakao_10_percent_auto", "promo_kakao_spring_wait_free"],
+      "downloadable_coupon_ids": [],
+      "coupon_ids": ["coupon_kakao_code_fixture"]
+    }
+  }
+}
+```
+
+### `price_history.json`
+
+Records are compatible with the `price_history` table fields and include `changed_fields` for local debugging.
+
+```json
+[
+  {
+    "id": "2fe69c2f-d8e0-5d2c-9b0b-e09c9d1f2c02",
+    "offer_id": "offer_kakao_moonlight",
+    "base_price": 500,
+    "instant_discounted_price": 450,
+    "coupon_expected_price": 405,
+    "cashback_adjusted_price": null,
+    "effective_price_for_sort": 405,
+    "recorded_at": "2026-05-09T00:00:00Z",
+    "changed_fields": ["base_price", "instant_discounted_price", "coupon_expected_price", "effective_price_for_sort"]
+  }
+]
+```
+
+### `crawl_logs.json`
+
+Records are compatible with the `crawl_logs` table fields. Simulated failures and retries are deterministic and are logged here.
+
+```json
+[
+  {
+    "id": "30a3f9b6-7d4c-45cc-9872-08e7f95b9d53",
+    "platform_id": "kakaopage",
+    "adapter_name": "MockKakaoPageAdapter",
+    "status": "success",
+    "started_at": "2026-05-09T00:00:00Z",
+    "finished_at": "2026-05-09T00:00:01Z",
+    "items_seen": 2,
+    "error_message": null,
+    "notes": "fixture-only mock crawl"
+  }
+]
+```
+
+### `notification_events.json`
+
+Records are compatible with the `notification_events` table fields. Supported mock event types are:
+
+- `free_episode_count_increased`
+- `wait_free_availability_changed`
+- `new_promotion_started`
+- `new_downloadable_coupon`
+- `coupon_expected_price_decreased`
+
+```json
+[
+  {
+    "id": "6cb00b5b-cb56-51bc-912e-c1ab1a5d909a",
+    "notification_rule_id": null,
+    "user_id": null,
+    "work_id": "work_moonlight_archive",
+    "offer_id": "offer_naver_moonlight",
+    "event_type": "free_episode_count_increased",
+    "payload": {
+      "previous_free_episode_count": 5,
+      "current_free_episode_count": 8,
+      "platform": "네이버웹툰"
+    },
+    "email_to": null,
+    "provider_message_id": null,
+    "created_at": "2026-05-09T00:00:00Z"
+  }
+]
+```
