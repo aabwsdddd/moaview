@@ -7,8 +7,14 @@ from fastapi import FastAPI
 from services.api.app.fixtures import search_works
 from services.api.app.health import health_payload
 from services.api.app.offers import list_calculated_offers
+from services.api.app.routes import events, favorites, notifications, search, works
 
 app = FastAPI(title="MoaView API", version="0.1.0")
+app.include_router(search.router)
+app.include_router(works.router)
+app.include_router(favorites.router)
+app.include_router(notifications.router)
+app.include_router(events.router)
 
 
 @app.get("/health", tags=["system"])
