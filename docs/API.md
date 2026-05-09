@@ -587,3 +587,9 @@ Records are compatible with the `notification_events` table fields. Supported mo
 `services/worker/send_notifications.py` updates local notification event records after processing. Dry-run and sent events keep `provider_message_id`; idempotency is also recorded in `.local/crawl-state/sent_notifications.json`. Delivery status is stored under `payload.notification_status` with values such as `dry_run_sent`, `sent`, `skipped_missing_email`, `skipped_duplicate`, or `failed`.
 
 Email copy must preserve the pricing labels used by the API: automatic discounts are rendered as confirmed prices, coupon prices are rendered as `쿠폰 적용 예상가`, and cashback values are rendered as estimated adjusted value, not cash discounts.
+
+## Verification and CI contract
+
+The API remains fixture-backed for E2E and CI. Playwright tests may mock `POST /api/events/search` and `POST /api/events/platform-click` at the browser network layer to assert deterministic event recording behavior without requiring Supabase, Resend, Railway, or real platform credentials. The request payload shapes remain the same as the event endpoint contracts above.
+
+CI must keep `NOTIFICATION_DRY_RUN=true` and must not send real email or perform production scraping. Fixture validation, pytest, mock crawler, notification worker dry-run behavior, web typecheck, and Playwright E2E are the expected verification layers.
