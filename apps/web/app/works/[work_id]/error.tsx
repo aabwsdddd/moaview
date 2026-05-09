@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 export default function WorkDetailError({ reset }: { error: Error; reset: () => void }) {
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-12">

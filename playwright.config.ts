@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const webBaseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000";
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
+const apiBaseUrl = process.env.MOAVIEW_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
 const reuseExistingServer = !process.env.CI;
 
 export default defineConfig({
@@ -29,6 +29,8 @@ export default defineConfig({
       command: "npm --workspace apps/web run dev",
       url: webBaseUrl,
       env: {
+        ...process.env,
+        MOAVIEW_API_BASE_URL: apiBaseUrl,
         NEXT_PUBLIC_API_BASE_URL: apiBaseUrl,
       },
       reuseExistingServer,

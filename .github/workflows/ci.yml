@@ -12,6 +12,7 @@ jobs:
     env:
       NOTIFICATION_DRY_RUN: "true"
       MOAVIEW_WEB_BASE_URL: http://127.0.0.1:3000
+      MOAVIEW_API_BASE_URL: http://127.0.0.1:8000
       NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:8000
     steps:
       - name: Check out repository
@@ -39,20 +40,18 @@ jobs:
           node-version: "22"
 
       - name: Install JavaScript dependencies
-        id: npm-install
-        continue-on-error: true
         run: npm install
 
       - name: Run web typecheck
-        if: steps.npm-install.outcome == 'success'
         run: npm run check
 
+      - name: Run web unit tests
+        run: npm --workspace apps/web run test
+
       - name: Install Playwright Chromium
-        if: steps.npm-install.outcome == 'success'
         run: npx playwright install --with-deps chromium
 
       - name: Run Playwright E2E tests
-        if: steps.npm-install.outcome == 'success'
         run: npm run e2e
 
       - name: Run make check

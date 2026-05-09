@@ -1,3 +1,4 @@
+import React from "react";
 export function PriceBadge({ label, value, tone = "default" }: { label: string; value: number | null; tone?: "default" | "confirmed" | "expected" | "cashback" }) {
   const tones = {
     default: "bg-slate-100 text-slate-700",

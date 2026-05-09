@@ -1,3 +1,4 @@
+import React from "react";
 import { SearchBox } from "../../components/search/SearchBox";
 import { SearchResults } from "../../components/search/SearchResults";
 import { searchWorks } from "../../lib/api";

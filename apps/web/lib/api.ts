@@ -140,7 +140,37 @@ export type PlatformClickPayload = {
   clicked_at?: string;
 };
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const DEFAULT_API_BASE_URL = "http://127.0.0.1:8000";
+
+export function getApiBaseUrl() {
+  const serverApiBaseUrl = typeof window === "undefined" ? process.env.MOAVIEW_API_BASE_URL : undefined;
+  return serverApiBaseUrl || process.env.NEXT_PUBLIC_API_BASE_URL || DEFAULT_API_BASE_URL;
+}
+
+function shouldLogApiFetchFailures() {
+  return process.env.NODE_ENV !== "production" || process.env.CI === "true";
+}
+
+async function responseSnippet(response: Response) {
+  try {
+    return (await response.text()).slice(0, 500);
+  } catch {
+    return "<unavailable>";
+  }
+}
+
+function logApiFetchFailure(path: string, reason: string, detail?: unknown) {
+  if (!shouldLogApiFetchFailures()) {
+    return;
+  }
+
+  const detailText = detail instanceof Error ? `${detail.name}: ${detail.message}` : detail;
+  console.error(`[moaview-api] ${reason}`, {
+    apiBaseUrl: getApiBaseUrl(),
+    path,
+    detail: detailText,
+  });
+}
 
 export function getAnonymousSessionId() {
   if (typeof window === "undefined") {
@@ -168,18 +198,20 @@ function withAuthHeader(accessToken?: string, headers?: HeadersInit): HeadersIni
 
 async function safeJson<T>(path: string, init?: RequestInit, fallback?: T, accessToken?: string): Promise<T> {
   try {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
+    const response = await fetch(`${getApiBaseUrl()}${path}`, {
       ...init,
       headers: withAuthHeader(accessToken, init?.headers),
       cache: "no-store",
     });
 
     if (!response.ok) {
+      logApiFetchFailure(path, `HTTP ${response.status} ${response.statusText}`, await responseSnippet(response));
       return fallback as T;
     }
 
     return (await response.json()) as T;
-  } catch {
+  } catch (error) {
+    logApiFetchFailure(path, "fetch failed", error);
     return fallback as T;
   }
 }

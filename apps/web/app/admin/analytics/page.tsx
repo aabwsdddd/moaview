@@ -1,3 +1,4 @@
+import React from "react";
 import { getAdminAnalyticsSummary, type AnalyticsTopPlatform, type AnalyticsTopWork } from "../../../lib/api";
 
 function formatRate(value: number) {

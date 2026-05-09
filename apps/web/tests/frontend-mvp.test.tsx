@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import React, { type ReactNode } from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { SearchResults } from "../components/search/SearchResults";
@@ -73,7 +73,7 @@ describe("frontend MVP flow components", () => {
     expect(screen.getByText("한서윤")).toBeInTheDocument();
     expect(screen.getByText("플랫폼: 카카오페이지")).toBeInTheDocument();
     expect(screen.getByText("쿠폰 적용 예상 최저가")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /달빛 기록관/ })).toHaveAttribute("href", "/works/work_moonlight_archive");
+    expect(screen.getByRole("link", { name: "달빛 기록관 상세 보기" })).toHaveAttribute("href", "/works/work_moonlight_archive");
 
     await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledWith(expect.stringContaining("/api/events/search"), expect.objectContaining({ method: "POST" })));
     vi.unstubAllGlobals();

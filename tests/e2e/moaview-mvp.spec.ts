@@ -1,9 +1,17 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("MoaView MVP core flow", () => {
-  test("searches a fixture work, compares platform prices, records CTA click, and shows favorite guidance", async ({ page }) => {
+  test("searches a fixture work, compares platform prices, records CTA click, and shows favorite guidance", async ({ page, request }) => {
     const searchEvents: unknown[] = [];
     const platformClickEvents: unknown[] = [];
+
+    const apiBaseUrl = process.env.MOAVIEW_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
+    expect(apiBaseUrl).toBe("http://127.0.0.1:8000");
+
+    const apiSearchResponse = await request.get(`${apiBaseUrl}/api/search`, { params: { q: "달빛" } });
+    expect(apiSearchResponse.ok()).toBeTruthy();
+    const apiSearchJson = await apiSearchResponse.json();
+    expect(apiSearchJson.items.map((item: { title: string }) => item.title)).toContain("달빛 기록관");
 
     await page.addInitScript(() => {
       window.open = (url?: string | URL) => {
@@ -29,10 +37,12 @@ test.describe("MoaView MVP core flow", () => {
 
     await expect(page).toHaveURL(/\/search\?q=/);
     await expect(page.getByRole("heading", { name: "작품 검색" })).toBeVisible();
-    await expect(page.getByRole("link", { name: /달빛 기록관/ })).toBeVisible();
+    await expect(page.locator("body")).toContainText("달빛 기록관");
+    const moonlightResultLink = page.getByRole("link", { name: /달빛 기록관 상세 보기/ });
+    await expect(moonlightResultLink).toBeVisible();
     await expect.poll(() => searchEvents.length).toBeGreaterThan(0);
 
-    await page.getByRole("link", { name: /달빛 기록관/ }).click();
+    await moonlightResultLink.click();
 
     await expect(page.getByRole("heading", { name: "달빛 기록관" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "플랫폼별 가격 비교" })).toBeVisible();

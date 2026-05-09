@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { SearchResult } from "../../lib/api";
 import { recordSearchEvent } from "../../lib/api";
 
@@ -60,11 +60,13 @@ export function SearchResults({ query, results }: { query: string; results: Sear
       </div>
       {results.map((work) => (
         <Link
+          aria-label={`${work.title} 상세 보기`}
           className="block rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md hover:ring-violet-200"
+          data-testid="search-result-link"
           href={`/works/${work.id}`}
           key={work.id}
         >
-          <article>
+          <article data-testid="search-result-card">
             <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-moa">{work.content_type}</p>

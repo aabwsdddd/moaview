@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { addFavorite, listFavorites, removeFavorite } from "../../lib/api/favorites";
 import { createSupabaseBrowserClient } from "../../lib/supabase/client";
 

@@ -1,3 +1,4 @@
+import React from "react";
 export default function AdminMergeReviewPage() {
   return (
     <main className="mx-auto min-h-screen max-w-4xl px-6 py-12">

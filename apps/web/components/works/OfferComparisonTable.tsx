@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import type { WorkOffer } from "../../lib/api";
 import { getAnonymousSessionId, recordPlatformClick } from "../../lib/api";
 import { PriceBadge } from "./PriceBadge";
