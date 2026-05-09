@@ -1,0 +1,20 @@
+[
+  {
+    "id": "coupon_first_read_20",
+    "platform": "네이버웹툰",
+    "title": "첫 열람 20% 쿠폰",
+    "discount_type": "percent",
+    "discount_value": 20,
+    "requires_user_action": true,
+    "label": "쿠폰 적용 예상가"
+  },
+  {
+    "id": "coupon_ridi_weekend_20krw",
+    "platform": "리디",
+    "title": "주말 20원 쿠폰",
+    "discount_type": "amount_krw",
+    "discount_value": 20,
+    "requires_user_action": true,
+    "label": "쿠폰 적용 예상가"
+  }
+]

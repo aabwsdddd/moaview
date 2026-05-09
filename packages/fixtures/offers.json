@@ -1,0 +1,41 @@
+[
+  {
+    "id": "offer_naver_moonlight",
+    "work_id": "work_moonlight_archive",
+    "platform": "네이버웹툰",
+    "base_price_krw": 300,
+    "instant_discount_krw": 0,
+    "coupon_expected_discount_krw": 60,
+    "cashback_rate": 0.05,
+    "free_episode_count": 5,
+    "wait_free_available": true,
+    "source_url": "https://example.com/naver/moonlight-archive",
+    "last_verified_at": "2026-05-01T09:00:00Z"
+  },
+  {
+    "id": "offer_kakao_moonlight",
+    "work_id": "work_moonlight_archive",
+    "platform": "카카오페이지",
+    "base_price_krw": 400,
+    "instant_discount_krw": 50,
+    "coupon_expected_discount_krw": 70,
+    "cashback_rate": 0.05,
+    "free_episode_count": 7,
+    "wait_free_available": true,
+    "source_url": "https://example.com/kakao/moonlight-archive",
+    "last_verified_at": "2026-05-01T09:10:00Z"
+  },
+  {
+    "id": "offer_ridi_clockwork",
+    "work_id": "work_clockwork_palace",
+    "platform": "리디",
+    "base_price_krw": 100,
+    "instant_discount_krw": 10,
+    "coupon_expected_discount_krw": 20,
+    "cashback_rate": 0.03,
+    "free_episode_count": 10,
+    "wait_free_available": false,
+    "source_url": "https://example.com/ridi/clockwork-palace",
+    "last_verified_at": "2026-05-01T10:00:00Z"
+  }
+]

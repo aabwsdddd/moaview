@@ -1,0 +1,1 @@
+"""MoaView API application."""
