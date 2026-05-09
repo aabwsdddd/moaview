@@ -1,0 +1,11 @@
+{
+  "name": "moaview",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/web"
+  ],
+  "scripts": {
+    "check": "npm --workspace apps/web run typecheck"
+  }
+}

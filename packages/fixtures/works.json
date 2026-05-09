@@ -1,0 +1,18 @@
+[
+  {
+    "id": "work_moonlight_archive",
+    "title": "달빛 기록관",
+    "authors": ["한서윤"],
+    "type": "webtoon",
+    "status": "ongoing",
+    "description": "비밀스러운 기록관에서 시작되는 판타지 로맨스."
+  },
+  {
+    "id": "work_clockwork_palace",
+    "title": "태엽 궁전의 소설가",
+    "authors": ["민도하", "Studio Moa"],
+    "type": "web_novel",
+    "status": "completed",
+    "description": "기계 궁전에서 계약 연재를 시작한 작가의 모험."
+  }
+]

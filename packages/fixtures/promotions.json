@@ -1,0 +1,10 @@
+[
+  {
+    "id": "promo_spring_wait_free",
+    "platform": "카카오페이지",
+    "title": "봄맞이 기다무 확대",
+    "description": "fixture 전용 프로모션 데이터입니다.",
+    "starts_at": "2026-05-01T00:00:00Z",
+    "ends_at": "2026-05-31T23:59:59Z"
+  }
+]
