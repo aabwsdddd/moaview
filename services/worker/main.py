@@ -1,15 +1,9 @@
-"""MoaView worker placeholder.
+"""Worker entry point."""
 
-This module intentionally performs no production crawling. Future jobs should use
-approved adapters and fixture-safe inputs until the crawler policy is reviewed.
-"""
+from __future__ import annotations
 
-
-def run() -> None:
-    """Run a no-op worker heartbeat."""
-
-    print("MoaView worker placeholder: no jobs scheduled")
+from services.worker.send_notifications import main
 
 
 if __name__ == "__main__":
-    run()
+    main()

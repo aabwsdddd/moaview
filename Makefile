@@ -1,4 +1,4 @@
-.PHONY: check seed web api worker crawl-mock
+.PHONY: check seed web api worker worker-notifications crawl-mock
 
 check:
 	python -m compileall services scripts
@@ -6,6 +6,7 @@ check:
 	python scripts/seed_db.py
 	python -m pytest tests
 	python services/crawler/run_mock_crawl.py --state-dir /tmp/moaview-crawl-state-check
+	python services/worker/send_notifications.py --state-dir /tmp/moaview-crawl-state-check
 	@if [ -d node_modules/@supabase/supabase-js ] && [ -d node_modules/vitest ] && [ -d node_modules/@testing-library/react ]; then npm run check && npm --workspace apps/web run test; else echo "Skipping web typecheck/tests: required node dependencies not installed"; fi
 
 seed:
@@ -19,6 +20,9 @@ api:
 
 worker:
 	python -m services.worker.main
+
+worker-notifications:
+	python services/worker/send_notifications.py
 
 
 crawl-mock:

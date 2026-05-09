@@ -280,6 +280,9 @@ def run_mock_crawl(
                     "offer": offer,
                     "calculated_price": calculated_price,
                     "promotion_ids": sorted(str(promotion["id"]) for promotion in promotions),
+                    "promotion_types": {
+                        str(promotion["id"]): promotion.get("promotion_type") for promotion in promotions
+                    },
                     "downloadable_coupon_ids": sorted(
                         str(coupon["id"]) for coupon in coupons if bool(coupon.get("downloadable"))
                     ),
@@ -401,6 +404,17 @@ def _detect_changes(previous: dict[str, Any], current: dict[str, Any], recorded_
                 )
             )
 
+        if int(current_price.get("instant_discounted_price", 0)) == 0 and int(previous_price.get("instant_discounted_price", 0)) > 0:
+            notification_events.append(
+                _notification_event(
+                    event_type="work_became_free",
+                    offer_id=offer_id,
+                    work_id=current_offer["work_id"],
+                    payload={"platform": current_offer["platform"]},
+                    created_at=recorded_at,
+                )
+            )
+
         new_promotions = sorted(set(current_entry.get("promotion_ids", [])) - set(previous_entry.get("promotion_ids", [])))
         if new_promotions:
             notification_events.append(
@@ -412,6 +426,29 @@ def _detect_changes(previous: dict[str, Any], current: dict[str, Any], recorded_
                     created_at=recorded_at,
                 )
             )
+            promotion_types = current_entry.get("promotion_types", {})
+            instant_promotions = [promotion_id for promotion_id in new_promotions if promotion_types.get(promotion_id) == "instant_discount"]
+            if instant_promotions:
+                notification_events.append(
+                    _notification_event(
+                        event_type="instant_discount_promotion_started",
+                        offer_id=offer_id,
+                        work_id=current_offer["work_id"],
+                        payload={"promotion_ids": instant_promotions, "platform": current_offer["platform"]},
+                        created_at=recorded_at,
+                    )
+                )
+            cashback_promotions = [promotion_id for promotion_id in new_promotions if promotion_types.get(promotion_id) == "cashback"]
+            if cashback_promotions:
+                notification_events.append(
+                    _notification_event(
+                        event_type="cashback_event_started",
+                        offer_id=offer_id,
+                        work_id=current_offer["work_id"],
+                        payload={"promotion_ids": cashback_promotions, "platform": current_offer["platform"]},
+                        created_at=recorded_at,
+                    )
+                )
 
         new_downloadable_coupons = sorted(
             set(current_entry.get("downloadable_coupon_ids", [])) - set(previous_entry.get("downloadable_coupon_ids", []))
