@@ -32,3 +32,15 @@ def search_works(query: str) -> list[dict[str, Any]]:
         if normalized_query in work["title"].casefold()
         or any(normalized_query in author.casefold() for author in work["authors"])
     ]
+
+
+def promotions_for_platform(platform: str) -> list[dict[str, Any]]:
+    """Return fixture promotions for a platform display name."""
+
+    return [promotion for promotion in load_fixture("promotions") if promotion["platform"] == platform]
+
+
+def coupons_for_platform(platform: str) -> list[dict[str, Any]]:
+    """Return fixture coupons for a platform display name."""
+
+    return [coupon for coupon in load_fixture("coupons") if coupon["platform"] == platform]
