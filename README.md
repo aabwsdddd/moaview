@@ -52,3 +52,15 @@ MoaView는 웹툰/웹소설을 어디서 가장 싸고 편하게 볼 수 있는�
 ## Current Status
 
 Planning and initial scaffold stage.
+
+## Supabase Auth local setup
+
+The web app uses Supabase Auth for the MVP login and favorites flow, but it must remain runnable in fixture-only mode.
+
+1. Copy `apps/web/.env.example` to `apps/web/.env.local`.
+2. Set `NEXT_PUBLIC_SUPABASE_URL` and either `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` or `NEXT_PUBLIC_SUPABASE_ANON_KEY` for local Supabase Auth.
+3. Keep `SUPABASE_SERVICE_ROLE_KEY` server-only. Do not expose it in client components.
+4. Set `NEXT_PUBLIC_API_BASE_URL` to the fixture-backed FastAPI service, for example `http://localhost:8000`.
+5. If Supabase env vars are blank, the Next.js app renders in development/test fixture mode: login controls show safe guidance, Google OAuth is not started, and tests do not require real credentials.
+
+This task does not implement platform account login, platform credential storage, payments, real email sending, or production scraping.

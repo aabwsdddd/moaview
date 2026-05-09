@@ -5,7 +5,7 @@ check:
 	python scripts/validate_fixtures.py
 	python scripts/seed_db.py
 	python -m pytest tests
-	@if [ -d node_modules ]; then npm run check; else echo "Skipping web typecheck: node_modules not installed"; fi
+	@if [ -d node_modules ]; then npm run check && npm --workspace apps/web run test; else echo "Skipping web typecheck/tests: node_modules not installed"; fi
 
 seed:
 	python scripts/seed_db.py --apply

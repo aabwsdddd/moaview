@@ -1,3 +1,7 @@
+import Link from "next/link";
+
+const sampleWorkId = "work_moonlight_archive";
+
 const sampleOffers = [
   {
     platform: "네이버웹툰",
@@ -41,6 +45,14 @@ export default function Home() {
             검색
           </button>
         </form>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link className="rounded-2xl border border-moa px-5 py-3 font-semibold text-moa transition hover:bg-violet-50" href={`/works/${sampleWorkId}`}>
+            샘플 작품 상세 보기
+          </Link>
+          <Link className="rounded-2xl border border-slate-300 px-5 py-3 font-semibold text-slate-700 transition hover:border-moa hover:text-moa" href="/favorites">
+            찜한 작품 보기
+          </Link>
+        </div>
       </section>
 
       <section id="offers" className="grid gap-4 md:grid-cols-2">
