@@ -1,6 +1,13 @@
 # MoaView API Contract
 
-The initial API is fixture-backed. It does not scrape production platforms and it does not require platform login.
+The initial API is fixture-backed. It does not scrape production platforms, does not connect to Naver, KakaoPage, or Ridi, and does not require platform login or Supabase credentials for tests.
+
+## Base conventions
+
+- MVP product flow: Search → Work Detail → Platform Comparison → Favorite → Platform Click Tracking.
+- Fixture timestamps and source URLs are returned so the UI can show price source and last updated time.
+- Coupon prices are labeled as expected prices when user action is required; cashback adjusted prices are estimated value and are not cash discounts.
+- Event payloads must include `anonymous_session_id` when `user_id` is not available.
 
 ## `GET /health`
 
@@ -12,9 +19,11 @@ Response body:
 {"status":"ok","service":"api"}
 ```
 
-## `GET /works?q={query}`
+## Compatibility endpoints
 
-Searches fixture works by title or author.
+### `GET /works?q={query}`
+
+Compatibility alias for the original fixture work search. Searches fixture works by title or author.
 
 Response body:
 
@@ -34,11 +43,9 @@ Response body:
 }
 ```
 
-## `GET /offers?work_id={work_id}`
+### `GET /offers?work_id={work_id}`
 
-Lists fixture platform offers. Every offer includes base price, automatic discount, coupon expected discount, cashback rate, free episode count, wait-free availability, source URL, and last verified time. The API enriches each fixture offer with deterministic calculated pricing.
-
-Coupon values are expected prices when user action is required; cashback values are estimated value, not cash discounts.
+Compatibility endpoint for the original calculated fixture offers. Every offer includes source URL and last verified time from the fixture plus the deterministic `calculated_price` object.
 
 Calculated price object:
 
@@ -53,11 +60,335 @@ Calculated price object:
   "calculation_note": "Automatic instant discounts are treated as confirmed. Coupon price is expected because coupon terms require user action or issuance.",
   "applied_promotion_ids": ["promo_kakao_10_percent_auto"],
   "applied_coupon_ids": ["coupon_kakao_code_fixture"],
-  "calculated_at": "2026-05-09T00:00:00Z"
+  "calculated_at": "2026-05-01T09:10:00Z"
 }
 ```
 
-Calculation rules:
+## New `/api/*` endpoints
+
+### `GET /api/search?q={query}`
+
+Searches fixture works by title or author and returns result cards enriched with platform comparison summary fields.
+
+Response example:
+
+```json
+{
+  "items": [
+    {
+      "id": "work_moonlight_archive",
+      "title": "달빛 기록관",
+      "authors": ["한서윤"],
+      "content_type": "webtoon",
+      "platforms": [
+        {
+          "id": "platform_naver_webtoon",
+          "label": "네이버웹툰",
+          "offer_id": "offer_naver_moonlight",
+          "source_url": "https://example.com/naver/moonlight-archive",
+          "last_updated_at": "2026-05-01T09:00:00Z"
+        },
+        {
+          "id": "platform_kakaopage",
+          "label": "카카오페이지",
+          "offer_id": "offer_kakao_moonlight",
+          "source_url": "https://example.com/kakao/moonlight-archive",
+          "last_updated_at": "2026-05-01T09:10:00Z"
+        }
+      ],
+      "max_free_episodes": 7,
+      "lowest_confirmed_price": 300,
+      "lowest_coupon_expected_price": 324,
+      "best_platform_label": "네이버웹툰"
+    }
+  ],
+  "count": 1
+}
+```
+
+### `GET /api/works/{work_id}`
+
+Returns work detail metadata and available platforms. `genre` is included when fixture data provides it; otherwise it is `null`.
+
+Response example:
+
+```json
+{
+  "id": "work_moonlight_archive",
+  "title": "달빛 기록관",
+  "authors": ["한서윤"],
+  "content_type": "webtoon",
+  "genre": null,
+  "status": "ongoing",
+  "description": "비밀스러운 기록관에서 시작되는 판타지 로맨스.",
+  "available_platforms": [
+    {
+      "id": "platform_naver_webtoon",
+      "label": "네이버웹툰",
+      "offer_id": "offer_naver_moonlight",
+      "source_url": "https://example.com/naver/moonlight-archive",
+      "last_updated_at": "2026-05-01T09:00:00Z"
+    },
+    {
+      "id": "platform_kakaopage",
+      "label": "카카오페이지",
+      "offer_id": "offer_kakao_moonlight",
+      "source_url": "https://example.com/kakao/moonlight-archive",
+      "last_updated_at": "2026-05-01T09:10:00Z"
+    }
+  ]
+}
+```
+
+Unknown work IDs return `404` with `{"detail":"Work not found"}`.
+
+### `GET /api/works/{work_id}/offers`
+
+Returns flattened platform comparison rows for one work. These rows use the same fixture data and deterministic pricing module as `GET /offers`.
+
+Response example:
+
+```json
+{
+  "items": [
+    {
+      "id": "offer_kakao_moonlight",
+      "work_id": "work_moonlight_archive",
+      "platform": "카카오페이지",
+      "platform_id": "platform_kakaopage",
+      "source_url": "https://example.com/kakao/moonlight-archive",
+      "last_updated_at": "2026-05-01T09:10:00Z",
+      "free_episode_count": 7,
+      "wait_free_available": true,
+      "base_price": 400,
+      "instant_discounted_price": 360,
+      "coupon_expected_price": 324,
+      "cashback_adjusted_price": null,
+      "effective_price_for_sort": 324,
+      "price_confidence": "estimated",
+      "calculation_note": "Automatic instant discounts are treated as confirmed. Coupon price is expected because coupon terms require user action or issuance.",
+      "active_promotions": [
+        {
+          "id": "promo_kakao_spring_wait_free",
+          "platform": "카카오페이지",
+          "promotion_type": "free_episode_event",
+          "title": "봄맞이 기다무 확대"
+        }
+      ],
+      "active_coupons": [
+        {
+          "id": "coupon_kakao_code_fixture",
+          "platform": "카카오페이지",
+          "coupon_type": "code_required",
+          "coupon_code": "FIXTURE10",
+          "title": "fixture 코드 10% 쿠폰",
+          "label": "쿠폰 적용 예상가"
+        }
+      ]
+    }
+  ],
+  "count": 2
+}
+```
+
+### `POST /api/favorites`
+
+Adds a work to the in-memory MVP favorites store. Full Supabase Auth integration can replace this storage later.
+
+Request example:
+
+```json
+{
+  "work_id": "work_moonlight_archive"
+}
+```
+
+Response example:
+
+```json
+{
+  "item": {
+    "user_id": "fixture_user",
+    "work_id": "work_moonlight_archive",
+    "created_at": "2026-05-09T00:00:00Z",
+    "work": {
+      "id": "work_moonlight_archive",
+      "title": "달빛 기록관",
+      "authors": ["한서윤"],
+      "content_type": "webtoon"
+    }
+  },
+  "count": 1
+}
+```
+
+### `DELETE /api/favorites/{work_id}`
+
+Removes a work from the in-memory favorites store. Deleting an absent favorite is idempotent.
+
+Response example:
+
+```json
+{
+  "deleted": true,
+  "work_id": "work_moonlight_archive",
+  "count": 0
+}
+```
+
+### `GET /api/favorites`
+
+Lists in-memory favorites with embedded work detail summaries.
+
+Response example:
+
+```json
+{
+  "items": [
+    {
+      "user_id": "fixture_user",
+      "work_id": "work_moonlight_archive",
+      "created_at": "2026-05-09T00:00:00Z",
+      "work": {
+        "id": "work_moonlight_archive",
+        "title": "달빛 기록관",
+        "authors": ["한서윤"],
+        "content_type": "webtoon"
+      }
+    }
+  ],
+  "count": 1
+}
+```
+
+### `GET /api/notifications`
+
+Returns fixture-compatible notification event records. Until the notification worker is implemented, this endpoint projects notification-like records from in-memory detail-view and platform-click events.
+
+Response example:
+
+```json
+{
+  "items": [
+    {
+      "id": "notification_event_platform-click_1",
+      "event_type": "platform-click",
+      "work_id": "work_moonlight_archive",
+      "user_id": null,
+      "anonymous_session_id": "anon_1",
+      "payload": {
+        "event_type": "platform-click",
+        "work_id": "work_moonlight_archive",
+        "offer_id": "offer_kakao_moonlight"
+      },
+      "created_at": "2026-05-09T12:00:00Z"
+    }
+  ],
+  "count": 1
+}
+```
+
+### `POST /api/events/search`
+
+Records a search analytics event.
+
+Request example:
+
+```json
+{
+  "anonymous_session_id": "anon_1",
+  "query": "달빛",
+  "result_count": 1
+}
+```
+
+Response example:
+
+```json
+{
+  "item": {
+    "id": "event_search_1",
+    "event_type": "search",
+    "user_id": null,
+    "anonymous_session_id": "anon_1",
+    "query": "달빛",
+    "result_count": 1,
+    "created_at": "2026-05-09T00:00:00Z"
+  },
+  "count": 1
+}
+```
+
+### `POST /api/events/detail-view`
+
+Records a work detail view analytics event.
+
+Request example:
+
+```json
+{
+  "anonymous_session_id": "anon_1",
+  "work_id": "work_moonlight_archive"
+}
+```
+
+Response example:
+
+```json
+{
+  "item": {
+    "id": "event_detail-view_1",
+    "event_type": "detail-view",
+    "user_id": null,
+    "anonymous_session_id": "anon_1",
+    "work_id": "work_moonlight_archive",
+    "created_at": "2026-05-09T00:00:00Z"
+  },
+  "count": 1
+}
+```
+
+### `POST /api/events/platform-click`
+
+Records an external platform CTA click. The stored event includes the work, platform, offer, CTA type, effective price at click, destination URL, and click timestamp. If `effective_price_at_click`, `destination_url`, or `platform_id` are omitted, the API derives them from the fixture offer.
+
+Request example:
+
+```json
+{
+  "anonymous_session_id": "anon_1",
+  "work_id": "work_moonlight_archive",
+  "platform_id": "platform_kakaopage",
+  "offer_id": "offer_kakao_moonlight",
+  "cta_type": "compare_cta",
+  "effective_price_at_click": 324,
+  "destination_url": "https://example.com/kakao/moonlight-archive",
+  "clicked_at": "2026-05-09T12:00:00Z"
+}
+```
+
+Response example:
+
+```json
+{
+  "item": {
+    "id": "event_platform-click_1",
+    "event_type": "platform-click",
+    "user_id": null,
+    "anonymous_session_id": "anon_1",
+    "work_id": "work_moonlight_archive",
+    "platform_id": "platform_kakaopage",
+    "offer_id": "offer_kakao_moonlight",
+    "cta_type": "compare_cta",
+    "effective_price_at_click": 324,
+    "destination_url": "https://example.com/kakao/moonlight-archive",
+    "clicked_at": "2026-05-09T12:00:00Z"
+  },
+  "count": 1
+}
+```
+
+## Pricing calculation rules
 
 - `base_price` is the original paid episode price.
 - Automatic `instant_discount` promotions reduce `instant_discounted_price` and can be `confirmed`.
@@ -67,7 +398,6 @@ Calculation rules:
 - Coupon `min_purchase_amount` and `max_discount_amount` are enforced.
 - Cashback is exposed as `cashback_adjusted_price` only and is not a direct cash discount.
 - `effective_price_for_sort` uses the best clear expected coupon price when available; otherwise it uses the confirmed instant discounted price. Cashback does not reduce the sort price.
-
 
 ## Database schema and seed contract
 
