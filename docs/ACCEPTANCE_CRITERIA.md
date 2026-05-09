@@ -49,3 +49,20 @@ The frontend MVP flow is accepted when all of the following are true:
 - The app works with fixture-backed API responses and does not require real scraping, platform login, paywall access, OCR, a built-in reader, comments, reviews, payments, or production crawling.
 - Component tests cover search cards, coupon expected price labeling, and CTA click event recording; Playwright E2E scaffold covers the search → detail → comparison → CTA flow.
 - `make check` passes.
+
+## Task 8: Email Notification Worker
+
+The email notification worker is accepted when all of the following are true:
+
+- The worker can be run with `make worker-notifications` or `python services/worker/send_notifications.py`.
+- The worker reads fixture-compatible pending notification records from the mock crawler state directory.
+- Supported notification triggers include free episode count increases, work became free events, instant discount promotion starts, downloadable coupon appearances, coupon expected price decreases, and cashback event starts.
+- Notification records are grouped by `email_to` when recipient data exists.
+- Korean email copy includes work title, platform name, event type, base price, confirmed automatic-discount price, coupon expected price when applicable, cashback adjusted estimated value when applicable, source URL, last verified time, and a MoaView CTA URL.
+- Coupon expected prices are labeled as expected prices that require coupon download/receipt, never as confirmed prices.
+- Cashback adjusted prices are described as estimated value and not as direct cash discounts.
+- Dry-run mode is available with `NOTIFICATION_DRY_RUN=true` and does not require `RESEND_API_KEY`.
+- Sent/dry-run events are marked with a provider message id and notification status so they are not delivered twice.
+- Missing email addresses are skipped safely, and send failures are logged without crashing the whole batch.
+- Tests cover dry-run rendering, coupon labels, cashback wording, idempotency, missing email skips, and send failure logging.
+- No Web Push, platform login integration, production scraping, or real email delivery in tests is introduced.

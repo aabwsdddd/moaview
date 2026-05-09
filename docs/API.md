@@ -510,10 +510,13 @@ Records are compatible with the `crawl_logs` table fields. Simulated failures an
 Records are compatible with the `notification_events` table fields. Supported mock event types are:
 
 - `free_episode_count_increased`
+- `work_became_free`
 - `wait_free_availability_changed`
 - `new_promotion_started`
+- `instant_discount_promotion_started`
 - `new_downloadable_coupon`
 - `coupon_expected_price_decreased`
+- `cashback_event_started`
 
 ```json
 [
@@ -535,3 +538,9 @@ Records are compatible with the `notification_events` table fields. Supported mo
   }
 ]
 ```
+
+### Notification worker delivery fields
+
+`services/worker/send_notifications.py` updates local notification event records after processing. Dry-run and sent events keep `provider_message_id`; idempotency is also recorded in `.local/crawl-state/sent_notifications.json`. Delivery status is stored under `payload.notification_status` with values such as `dry_run_sent`, `sent`, `skipped_missing_email`, `skipped_duplicate`, or `failed`.
+
+Email copy must preserve the pricing labels used by the API: automatic discounts are rendered as confirmed prices, coupon prices are rendered as `쿠폰 적용 예상가`, and cashback values are rendered as estimated adjusted value, not cash discounts.

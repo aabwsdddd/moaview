@@ -119,3 +119,28 @@ Generated local files:
 - `notification_events.json`
 
 `.local/` is ignored by Git. Live database writes are intentionally not required for the MVP; future DB integration must be optional behind `DATABASE_URL`. Production scraping remains out of scope until `docs/CRAWLER_POLICY.md` is reviewed.
+
+## Email notification worker
+
+Task 8 adds a fixture-safe email notification worker for mock-crawler notification events. The worker reads pending records from `.local/crawl-state/notification_events.json`, joins offer details from `.local/crawl-state/snapshot.json`, groups notifications by `email_to`, renders Korean email subject/body copy, and marks each event as `dry_run_sent`, `sent`, `skipped_missing_email`, `skipped_duplicate`, or `failed` inside the event payload.
+
+Run the notification worker after `make crawl-mock` has produced local crawler state:
+
+```bash
+make worker-notifications
+```
+
+Equivalent direct command:
+
+```bash
+python services/worker/send_notifications.py
+```
+
+Environment variables:
+
+- `RESEND_API_KEY=` — Resend API key for future real email delivery; not required when dry-run is enabled.
+- `RESEND_FROM_EMAIL=MoaView <notifications@moaview.local>` — sender used for non-dry-run Resend calls.
+- `NOTIFICATION_DRY_RUN=true` — default-safe mode that logs email payloads and records `dry_run:*` provider message ids instead of sending network email.
+- `MOAVIEW_WEB_BASE_URL=http://localhost:3000` — base URL used to render CTA links back to MoaView work detail pages.
+
+The worker intentionally does not send real emails in tests, does not require real Resend credentials in development, does not implement Web Push, does not integrate platform login, and does not scrape authenticated platform pages.

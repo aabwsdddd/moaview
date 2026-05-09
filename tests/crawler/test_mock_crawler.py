@@ -151,3 +151,80 @@ def test_mock_crawl_makes_no_network_calls(monkeypatch: pytest.MonkeyPatch, tmp_
     result = run_mock_crawl(fixture_root=fixture_root, state_dir=tmp_path / "state")
 
     assert len(result.snapshot["offers"]) == 3
+
+
+def test_work_becoming_free_creates_notification_event(tmp_path: Path) -> None:
+    fixture_root = copy_fixtures(tmp_path)
+    state_dir = tmp_path / "state"
+    run_mock_crawl(fixture_root=fixture_root, state_dir=state_dir)
+
+    offers = read_fixture(fixture_root, "offers")
+    for offer in offers:
+        if offer["id"] == "offer_kakao_moonlight":
+            offer["base_price_krw"] = 0
+            offer["last_verified_at"] = "2026-05-02T09:10:00Z"
+    write_fixture(fixture_root, "offers", offers)
+
+    result = run_mock_crawl(fixture_root=fixture_root, state_dir=state_dir)
+
+    event = next(event for event in result.notification_events if event["event_type"] == "work_became_free")
+    assert event["offer_id"] == "offer_kakao_moonlight"
+    assert event["payload"]["platform"] == "카카오페이지"
+
+
+def test_instant_discount_promotion_start_creates_specific_notification_event(tmp_path: Path) -> None:
+    fixture_root = copy_fixtures(tmp_path)
+    state_dir = tmp_path / "state"
+    run_mock_crawl(fixture_root=fixture_root, state_dir=state_dir)
+
+    promotions = read_fixture(fixture_root, "promotions")
+    promotions.append(
+        {
+            "id": "promo_naver_fixture_auto_5",
+            "platform": "네이버웹툰",
+            "promotion_type": "instant_discount",
+            "title": "fixture 자동 5% 즉시 할인",
+            "description": "모든 사용자가 받는 fixture 자동 즉시 할인입니다.",
+            "discount_percent": 5,
+            "starts_at": "2026-05-01T00:00:00Z",
+            "ends_at": "2026-05-31T23:59:59Z",
+            "source_url": "https://example.com/naver/promotions/auto-5",
+            "last_verified_at": "2026-05-02T09:00:00Z",
+        }
+    )
+    write_fixture(fixture_root, "promotions", promotions)
+
+    result = run_mock_crawl(fixture_root=fixture_root, state_dir=state_dir)
+
+    event = next(event for event in result.notification_events if event["event_type"] == "instant_discount_promotion_started")
+    assert event["offer_id"] == "offer_naver_moonlight"
+    assert event["payload"]["promotion_ids"] == ["promo_naver_fixture_auto_5"]
+
+
+def test_cashback_promotion_start_creates_specific_notification_event(tmp_path: Path) -> None:
+    fixture_root = copy_fixtures(tmp_path)
+    state_dir = tmp_path / "state"
+    run_mock_crawl(fixture_root=fixture_root, state_dir=state_dir)
+
+    promotions = read_fixture(fixture_root, "promotions")
+    promotions.append(
+        {
+            "id": "promo_kakao_fixture_cashback_3",
+            "platform": "카카오페이지",
+            "promotion_type": "cashback",
+            "title": "fixture 3% 캐시백",
+            "description": "캐시백은 현금 할인이 아닌 추정 체감가로만 표시합니다.",
+            "cashback_percent": 3,
+            "starts_at": "2026-05-01T00:00:00Z",
+            "ends_at": "2026-05-31T23:59:59Z",
+            "source_url": "https://example.com/kakao/promotions/cashback-3",
+            "last_verified_at": "2026-05-02T09:10:00Z",
+        }
+    )
+    write_fixture(fixture_root, "promotions", promotions)
+
+    result = run_mock_crawl(fixture_root=fixture_root, state_dir=state_dir)
+
+    event = next(event for event in result.notification_events if event["event_type"] == "cashback_event_started")
+    assert event["offer_id"] == "offer_kakao_moonlight"
+    assert event["payload"]["promotion_ids"] == ["promo_kakao_fixture_cashback_3"]
