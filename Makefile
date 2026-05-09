@@ -1,10 +1,14 @@
-.PHONY: check web api worker
+.PHONY: check seed web api worker
 
 check:
 	python -m compileall services scripts
 	python scripts/validate_fixtures.py
+	python scripts/seed_db.py
 	python -m pytest tests
 	@if [ -d node_modules ]; then npm run check; else echo "Skipping web typecheck: node_modules not installed"; fi
+
+seed:
+	python scripts/seed_db.py --apply
 
 web:
 	npm --workspace apps/web run dev
