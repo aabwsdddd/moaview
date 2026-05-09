@@ -23,4 +23,6 @@ npx playwright install chromium
 npm run e2e
 ```
 
-`playwright.config.ts` starts the fixture FastAPI API on `127.0.0.1:8000` and the Next.js app on `127.0.0.1:3000` when they are not already running.
+`playwright.config.ts` starts the fixture FastAPI API on `127.0.0.1:8000` and the Next.js app on `127.0.0.1:3000` when they are not already running. It passes both `MOAVIEW_API_BASE_URL` and `NEXT_PUBLIC_API_BASE_URL` as `http://127.0.0.1:8000` to the Next.js web server so server components and client-side event calls use the same fixture API.
+
+The core `GET /api/search?q=달빛` contract is not mocked in Playwright. The test first verifies the live fixture API returns `달빛 기록관`, then verifies the server-rendered `/search?q=달빛` page contains the same title. Only analytics event endpoints are mocked at the browser network layer to keep event assertions deterministic.
