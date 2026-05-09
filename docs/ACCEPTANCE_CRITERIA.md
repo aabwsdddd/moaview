@@ -66,3 +66,17 @@ The email notification worker is accepted when all of the following are true:
 - Missing email addresses are skipped safely, and send failures are logged without crashing the whole batch.
 - Tests cover dry-run rendering, coupon labels, cashback wording, idempotency, missing email skips, and send failure logging.
 - No Web Push, platform login integration, production scraping, or real email delivery in tests is introduced.
+
+
+## Task 9: MVP Analytics Dashboard
+
+The MVP analytics dashboard is accepted when all of the following are true:
+
+- `GET /api/admin/analytics/summary` returns fixture-backed totals for searches, detail views, platform clicks, favorites, top clicked works, top clicked platforms, top coupon CTA works, and a deterministic calculation timestamp.
+- The analytics summary returns `search_to_detail_rate`, `detail_to_platform_click_rate`, `favorite_rate`, `coupon_cta_click_rate`, `notification_click_rate`, and `returning_user_7_day_rate` when identifiable event history has a full 7-day observation window.
+- Rate calculations are deterministic in tests, division by zero returns `0.0` instead of crashing, and insufficient 7-day return cohorts return `null`.
+- `/admin/analytics` renders Korean KPI cards for 검색 수, 상세 진입 수, 플랫폼 클릭 수, 검색→상세 전환율, 상세→클릭 전환율, 찜 등록률, 쿠폰 CTA 클릭률, and 알림 클릭률.
+- `/admin/analytics` renders Korean tables for 많이 클릭된 작품, 많이 클릭된 플랫폼, and 쿠폰 CTA가 많이 눌린 작품, including clear empty states.
+- The admin analytics page shows the calculation timestamp and includes a TODO to replace the MVP unprotected placeholder with real admin auth.
+- No third-party analytics tools, advertising integrations, production database credentials, platform login integration, real scraping, or production crawling are introduced.
+- Tests cover fixture analytics calculation, division by zero, coupon CTA rate calculation, API contract, dashboard rendering, and `make check` passes.

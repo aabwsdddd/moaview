@@ -189,6 +189,7 @@ create table notification_events (
     id uuid primary key default gen_random_uuid(),
     notification_rule_id uuid references notification_rules(id) on delete set null,
     user_id uuid references users_profile(user_id) on delete set null,
+    anonymous_session_id text,
     work_id uuid references works(id) on delete set null,
     offer_id uuid references offers(id) on delete set null,
     event_type text not null,
@@ -201,6 +202,7 @@ create table notification_events (
 create table search_events (
     id uuid primary key default gen_random_uuid(),
     user_id uuid references users_profile(user_id) on delete set null,
+    anonymous_session_id text,
     query text not null,
     result_count integer not null default 0 check (result_count >= 0),
     created_at timestamptz not null default now()
@@ -209,6 +211,7 @@ create table search_events (
 create table detail_view_events (
     id uuid primary key default gen_random_uuid(),
     user_id uuid references users_profile(user_id) on delete set null,
+    anonymous_session_id text,
     work_id uuid not null references works(id) on delete cascade,
     created_at timestamptz not null default now()
 );
@@ -216,9 +219,12 @@ create table detail_view_events (
 create table click_events (
     id uuid primary key default gen_random_uuid(),
     user_id uuid references users_profile(user_id) on delete set null,
+    anonymous_session_id text,
     work_id uuid references works(id) on delete set null,
     offer_id uuid references offers(id) on delete set null,
     platform_id uuid references platforms(id) on delete set null,
+    cta_type text not null default 'open_platform',
+    effective_price_at_click integer check (effective_price_at_click is null or effective_price_at_click >= 0),
     destination_url text not null,
     referrer text,
     created_at timestamptz not null default now()

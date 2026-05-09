@@ -388,6 +388,47 @@ Response example:
 }
 ```
 
+
+### `GET /api/admin/analytics/summary`
+
+Returns deterministic fixture-backed MVP KPI analytics for the admin dashboard. This MVP endpoint may be unprotected while the product validates metrics, but production must add real admin authorization before exposing it. It uses in-memory/local fixture event records and does not require production database credentials for tests.
+
+Rate definitions:
+
+- `search_to_detail_rate` = detail view events / search events.
+- `detail_to_platform_click_rate` = platform click events / detail view events.
+- `favorite_rate` = favorite records / detail view events.
+- `coupon_cta_click_rate` = platform click events whose `cta_type` is `coupon_cta` / detail view events.
+- `notification_click_rate` = platform click events whose `cta_type` is `notification_cta` / notification event records.
+- `returning_user_7_day_rate` is `null` until an identifiable first-event cohort has a full 7-day observation window; otherwise it is eligible identities with a return event 1-7 days after their first event / eligible identifiable event identities.
+
+Response example:
+
+```json
+{
+  "total_searches": 10,
+  "total_detail_views": 6,
+  "total_platform_clicks": 3,
+  "total_favorites": 2,
+  "search_to_detail_rate": 0.6,
+  "detail_to_platform_click_rate": 0.5,
+  "favorite_rate": 0.3333,
+  "coupon_cta_click_rate": 0.1667,
+  "notification_click_rate": 0.0,
+  "returning_user_7_day_rate": null,
+  "top_clicked_works": [
+    {"work_id": "work_moonlight_archive", "title": "달빛 기록관", "count": 2}
+  ],
+  "top_clicked_platforms": [
+    {"platform_id": "platform_kakaopage", "label": "카카오페이지", "count": 2}
+  ],
+  "top_coupon_cta_works": [
+    {"work_id": "work_moonlight_archive", "title": "달빛 기록관", "count": 1}
+  ],
+  "generated_at": "2026-05-09T00:00:00Z"
+}
+```
+
 ## Pricing calculation rules
 
 - `base_price` is the original paid episode price.
@@ -408,6 +449,8 @@ Content records support `WEBTOON` and `WEBNOVEL` through the `content_type` enum
 Promotion rows use the `promotion_type` enum values `instant_discount`, `cashback`, `bonus_currency`, `free_episode_event`, and `bundle_discount`. Coupon rows keep separate flags for `downloadable`, `auto_issued`, `code_required`, `first_purchase_only`, and `user_targeted` so user-specific coupons are never treated as confirmed prices without known account state.
 
 Computed prices are stored in `computed_offer_prices` with `base_price`, `instant_discounted_price`, `coupon_expected_price`, `cashback_adjusted_price`, `effective_price_for_sort`, `price_confidence`, `calculation_note`, `applied_promotion_ids`, `applied_coupon_ids`, and `calculated_at`. `price_confidence` separates confirmed automatic discounts, estimated coupon/cashback outcomes, and user-targeted unknown states.
+
+Event tables keep `anonymous_session_id` alongside nullable `user_id` so fixture and unauthenticated MVP flows can be measured without production credentials. `click_events` also stores `cta_type` and `effective_price_at_click` to support coupon CTA, notification CTA, and price-at-click analytics.
 
 Local seed data is intentionally small and fixture-like. Validate it with:
 
