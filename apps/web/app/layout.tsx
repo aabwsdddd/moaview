@@ -19,8 +19,17 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
               MoaView
             </Link>
             <div className="flex items-center gap-4">
+              <Link className="text-sm font-semibold text-slate-700 transition hover:text-moa" href="/search">
+                검색
+              </Link>
               <Link className="text-sm font-semibold text-slate-700 transition hover:text-moa" href="/favorites">
                 찜한 작품
+              </Link>
+              <Link className="text-sm font-semibold text-slate-700 transition hover:text-moa" href="/notifications">
+                알림
+              </Link>
+              <Link className="text-sm font-semibold text-slate-700 transition hover:text-moa" href="/admin/merge-review">
+                병합 검토
               </Link>
               <AuthStatus />
             </div>

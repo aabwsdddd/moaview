@@ -29,3 +29,23 @@ The auth and favorites flow is accepted when all of the following are true:
 - `.env.example` documents `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, and `NEXT_PUBLIC_API_BASE_URL`.
 - Tests cover login page rendering, logged-out favorite guidance, favorites empty state, and missing-env Supabase utility behavior.
 - No platform login integration, platform credential storage, payments, real email sending, real scraping, or production crawling is introduced.
+
+## Task 6: Full Frontend MVP Flow
+
+The frontend MVP flow is accepted when all of the following are true:
+
+- `/` includes a search input plus fixture-backed popular works, free/event works when available, and recent update sections when timestamps are available.
+- `/search?q={query}` reads the URL query, renders result cards with title, authors, content type, platforms, max free episodes, lowest confirmed price, and lowest coupon expected price.
+- A performed search attempts to record `POST /api/events/search` with an anonymous session id when a user id is unavailable.
+- Search result cards navigate to `/works/[work_id]`.
+- `/works/[work_id]` renders a work hero with title, authors, content type, status, genre when available, and description when available.
+- The work detail platform comparison table shows platform, free episode count, wait-free availability, base price, instant discounted price, coupon expected price, cashback adjusted price, price confidence, source URL, and last updated time for every offer.
+- Price labels clearly separate `확정가`, `쿠폰 적용 예상가`, and `캐시백 포함 체감가`; coupon expected prices are never labeled as confirmed prices.
+- Each offer exposes `calculation_note` in expandable help text.
+- CTA buttons `무료로 보기`, `최저가로 보기`, and `쿠폰 받고 보기` record `POST /api/events/platform-click` before opening the fixture destination URL.
+- `/favorites` continues to use the Task 5 auth/favorites behavior.
+- `/notifications` renders fixture notification events or a clear empty state.
+- `/admin/merge-review` explains that it is a manual dedup/merge review placeholder and does not add complex admin auth.
+- The app works with fixture-backed API responses and does not require real scraping, platform login, paywall access, OCR, a built-in reader, comments, reviews, payments, or production crawling.
+- Component tests cover search cards, coupon expected price labeling, and CTA click event recording; Playwright E2E scaffold covers the search → detail → comparison → CTA flow.
+- `make check` passes.

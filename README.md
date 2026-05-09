@@ -64,3 +64,31 @@ The web app uses Supabase Auth for the MVP login and favorites flow, but it must
 5. If Supabase env vars are blank, the Next.js app renders in development/test fixture mode: login controls show safe guidance, Google OAuth is not started, and tests do not require real credentials.
 
 This task does not implement platform account login, platform credential storage, payments, real email sending, or production scraping.
+
+## Frontend MVP run steps
+
+The Next.js app now implements the fixture-backed user flow: Home → Search → Work Detail → Platform Comparison → External Platform CTA.
+
+1. Install JavaScript dependencies from the repository root:
+   ```bash
+   npm install
+   ```
+2. Start the fixture-backed FastAPI service in one terminal:
+   ```bash
+   make api
+   ```
+3. Start the web app in another terminal:
+   ```bash
+   npm --workspace apps/web run dev
+   ```
+4. Open `http://localhost:3000`, search for `달빛` or `한서윤`, open a result, compare platform offers, favorite the work if logged in through Supabase Auth, and click one of the external CTA buttons.
+
+Useful frontend routes:
+- `/` — search entry, popular fixture works, free/event works, recent update section.
+- `/search?q=달빛` — fixture search result cards and search event recording.
+- `/works/work_moonlight_archive` — detail hero, favorite CTA, and platform comparison table.
+- `/favorites` — Task 5 favorites list/empty state.
+- `/notifications` — fixture-compatible notification event list/empty state.
+- `/admin/merge-review` — manual dedup/merge review placeholder.
+
+The frontend remains fixture-safe: it does not scrape platforms, bypass login, connect to platform accounts, render a built-in reader, or treat coupon expected prices as confirmed prices.
