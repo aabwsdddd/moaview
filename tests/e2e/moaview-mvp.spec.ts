@@ -38,10 +38,11 @@ test.describe("MoaView MVP core flow", () => {
     await expect(page).toHaveURL(/\/search\?q=/);
     await expect(page.getByRole("heading", { name: "작품 검색" })).toBeVisible();
     await expect(page.locator("body")).toContainText("달빛 기록관");
-    await expect(page.getByRole("link", { name: /달빛 기록관/ })).toBeVisible();
+    const moonlightResultLink = page.getByRole("link", { name: /달빛 기록관 상세 보기/ });
+    await expect(moonlightResultLink).toBeVisible();
     await expect.poll(() => searchEvents.length).toBeGreaterThan(0);
 
-    await page.getByRole("link", { name: /달빛 기록관/ }).click();
+    await moonlightResultLink.click();
 
     await expect(page.getByRole("heading", { name: "달빛 기록관" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "플랫폼별 가격 비교" })).toBeVisible();
