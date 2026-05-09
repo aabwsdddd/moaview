@@ -51,7 +51,57 @@ MoaView는 웹툰/웹소설을 어디서 가장 싸고 편하게 볼 수 있는�
 
 ## Current Status
 
-Planning and initial scaffold stage.
+MoaView is a fixture-backed MVP scaffold with a working FastAPI API, Next.js frontend flow, mock crawler, dry-run notification worker, analytics dashboard, pytest/Vitest coverage, Playwright E2E coverage, and GitHub Actions CI. It is still intentionally not connected to real platform accounts or production scraping.
+
+## Beginner quick start
+
+Follow these steps to run the project locally with fixture data only. No Supabase, Resend, Railway, Naver, KakaoPage, or Ridi credentials are required.
+
+1. Install Python dependencies:
+
+   ```bash
+   python -m pip install -r services/api/requirements.txt pytest
+   ```
+
+2. Install JavaScript dependencies from the repository root:
+
+   ```bash
+   npm install
+   ```
+
+3. Copy environment templates if you want local `.env` files:
+
+   ```bash
+   cp .env.example .env
+   cp apps/web/.env.example apps/web/.env.local
+   ```
+
+4. In one terminal, start the fixture API:
+
+   ```bash
+   make api
+   ```
+
+5. In a second terminal, start the web app:
+
+   ```bash
+   npm --workspace apps/web run dev
+   ```
+
+6. Open `http://localhost:3000`, search for `달빛`, open `달빛 기록관`, compare platform prices, and click `쿠폰 받고 보기` or `최저가로 보기`.
+
+7. Run all fixture-safe checks:
+
+   ```bash
+   make check
+   ```
+
+8. Optional: install a Playwright browser and run E2E tests:
+
+   ```bash
+   npx playwright install chromium
+   npm run e2e
+   ```
 
 ## Supabase Auth local setup
 
@@ -92,6 +142,31 @@ Useful frontend routes:
 - `/admin/merge-review` — manual dedup/merge review placeholder.
 
 The frontend remains fixture-safe: it does not scrape platforms, bypass login, connect to platform accounts, render a built-in reader, or treat coupon expected prices as confirmed prices.
+
+## E2E tests and CI
+
+Playwright tests live in `tests/e2e` and use `playwright.config.ts`. The config starts the fixture FastAPI API and Next.js app automatically when they are not already running. The E2E suite covers the core MVP flow: home page load, fixture search, work detail navigation, platform comparison table, confirmed/coupon/cashback labels, mocked platform-click event recording, and logged-out favorite guidance.
+
+Useful commands:
+
+```bash
+npm run e2e
+make e2e
+```
+
+GitHub Actions CI is defined in `.github/workflows/ci.yml`. It installs Python dependencies, validates fixtures, runs pytest, attempts JavaScript dependency installation, runs web typecheck and Playwright when JavaScript dependencies install successfully, and finishes with `make check`.
+
+## Deployment overview
+
+See `docs/DEPLOYMENT.md` for the full deployment guide. The intended MVP deployment shape is:
+
+- **Vercel** for the Next.js app in `apps/web`.
+- **Railway** for the FastAPI API in `services/api`.
+- **Railway Cron** for the fixture-only mock crawler and notification worker.
+- **Supabase** for Postgres/Auth when moving beyond fixture-only local mode.
+- **Resend** for email notifications after dry-run output has been reviewed.
+
+Required environment variables are documented in `.env.example` and `docs/DEPLOYMENT.md`. Keep secrets out of Git. The deployed MVP remains fixture-based unless Supabase/Resend are explicitly configured; production scraping, platform login integration, built-in reader, OCR, AI recommendations, comments, payments, and Naver/KakaoPage/Ridi connections remain intentionally out of scope.
 
 ## Mock crawler
 

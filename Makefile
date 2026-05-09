@@ -1,4 +1,4 @@
-.PHONY: check seed web api worker worker-notifications crawl-mock
+.PHONY: check seed web api worker worker-notifications crawl-mock e2e
 
 check:
 	python -m compileall services scripts
@@ -27,3 +27,6 @@ worker-notifications:
 
 crawl-mock:
 	python services/crawler/run_mock_crawl.py
+
+e2e:
+	npm run e2e

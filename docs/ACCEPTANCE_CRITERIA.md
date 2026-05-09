@@ -80,3 +80,20 @@ The MVP analytics dashboard is accepted when all of the following are true:
 - The admin analytics page shows the calculation timestamp and includes a TODO to replace the MVP unprotected placeholder with real admin auth.
 - No third-party analytics tools, advertising integrations, production database credentials, platform login integration, real scraping, or production crawling are introduced.
 - Tests cover fixture analytics calculation, division by zero, coupon CTA rate calculation, API contract, dashboard rendering, and `make check` passes.
+
+## Task 10: E2E Tests, CI Checks, and Deployment Preparation
+
+The deployment-readiness task is accepted when all of the following are true:
+
+- Playwright E2E tests exist under `tests/e2e` for the fixture-safe core flow: home → search → work detail → platform comparison → external platform CTA.
+- E2E assertions verify that confirmed price (`확정가`), coupon expected price (`쿠폰 적용 예상가`), and cashback adjusted price (`캐시백 포함 체감가`) labels are visible and that coupon/cashback wording does not present user-action coupons or cashback as confirmed cash discounts.
+- Platform-click recording is asserted through a deterministic mocked API response; tests must not require real Supabase, Resend, Railway, or platform credentials.
+- Favorites E2E coverage verifies either logged-out login guidance or fixture-auth behavior.
+- `playwright.config.ts` starts the fixture FastAPI API and Next.js web app through `webServer` where possible.
+- `package.json` exposes an E2E npm script, and `Makefile` exposes a matching convenience target.
+- GitHub Actions CI installs Python dependencies, validates fixtures, runs pytest, attempts web dependency installation, runs web typecheck and Playwright when feasible, and runs `make check`.
+- `.env.example` and `apps/web/.env.example` document deployment/local variables without real secrets.
+- `docs/DEPLOYMENT.md` documents Vercel, Railway API, Railway Cron worker/mock crawler, Supabase, Resend, required environment variables, fixture-only behavior, and intentionally unimplemented scope.
+- `README.md` includes beginner-friendly local run steps and links the deployment guide.
+- No production scraping, platform login integration, Naver/KakaoPage/Ridi integration, real email sending in tests, OCR, reader, payments, reviews, comments, or AI recommendations are added.
+- `make check` passes, with web checks skipped only when local JavaScript dependencies are not installed.
