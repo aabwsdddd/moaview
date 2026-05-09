@@ -108,6 +108,26 @@ def test_computed_offer_prices_store_required_price_fields() -> None:
     )
 
 
+def test_event_tables_support_anonymous_identity_and_click_context() -> None:
+    assert_columns("search_events", {"user_id", "anonymous_session_id", "query", "result_count", "created_at"})
+    assert_columns("detail_view_events", {"user_id", "anonymous_session_id", "work_id", "created_at"})
+    assert_columns(
+        "click_events",
+        {
+            "user_id",
+            "anonymous_session_id",
+            "work_id",
+            "offer_id",
+            "platform_id",
+            "cta_type",
+            "effective_price_at_click",
+            "destination_url",
+            "created_at",
+        },
+    )
+    assert_columns("notification_events", {"user_id", "anonymous_session_id", "event_type", "payload", "created_at"})
+
+
 def test_seed_file_contains_small_fixture_structure() -> None:
     seed_sql = SEED_PATH.read_text(encoding="utf-8")
     assert "insert into platforms" in seed_sql

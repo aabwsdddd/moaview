@@ -99,12 +99,42 @@ export type NotificationResponse = {
   count: number;
 };
 
+
+export type AnalyticsTopWork = {
+  work_id: string;
+  title: string;
+  count: number;
+};
+
+export type AnalyticsTopPlatform = {
+  platform_id: string;
+  label: string;
+  count: number;
+};
+
+export type AnalyticsSummary = {
+  total_searches: number;
+  total_detail_views: number;
+  total_platform_clicks: number;
+  total_favorites: number;
+  search_to_detail_rate: number;
+  detail_to_platform_click_rate: number;
+  favorite_rate: number;
+  coupon_cta_click_rate: number;
+  notification_click_rate: number;
+  returning_user_7_day_rate?: number | null;
+  top_clicked_works: AnalyticsTopWork[];
+  top_clicked_platforms: AnalyticsTopPlatform[];
+  top_coupon_cta_works: AnalyticsTopWork[];
+  generated_at: string;
+};
+
 export type PlatformClickPayload = {
   anonymous_session_id: string;
   work_id: string;
   platform_id: string;
   offer_id: string;
-  cta_type: "free_cta" | "lowest_price_cta" | "coupon_cta" | "compare_cta";
+  cta_type: "free_cta" | "lowest_price_cta" | "coupon_cta" | "compare_cta" | "notification_cta";
   effective_price_at_click?: number;
   destination_url?: string;
   clicked_at?: string;
@@ -211,4 +241,23 @@ export async function getWorkOffers(workId: string): Promise<WorkOffer[]> {
 
 export async function listNotifications(): Promise<NotificationResponse> {
   return safeJson<NotificationResponse>("/api/notifications", undefined, { items: [], count: 0 });
+}
+
+export async function getAdminAnalyticsSummary(): Promise<AnalyticsSummary> {
+  return safeJson<AnalyticsSummary>("/api/admin/analytics/summary", undefined, {
+    total_searches: 0,
+    total_detail_views: 0,
+    total_platform_clicks: 0,
+    total_favorites: 0,
+    search_to_detail_rate: 0,
+    detail_to_platform_click_rate: 0,
+    favorite_rate: 0,
+    coupon_cta_click_rate: 0,
+    notification_click_rate: 0,
+    returning_user_7_day_rate: null,
+    top_clicked_works: [],
+    top_clicked_platforms: [],
+    top_coupon_cta_works: [],
+    generated_at: "",
+  });
 }
