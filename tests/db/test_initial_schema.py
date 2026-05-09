@@ -84,6 +84,8 @@ def test_coupons_support_required_issuance_flags() -> None:
             "code_required",
             "first_purchase_only",
             "user_targeted",
+            "min_purchase_amount",
+            "max_discount_amount",
         },
     )
 
@@ -99,6 +101,9 @@ def test_computed_offer_prices_store_required_price_fields() -> None:
             "effective_price_for_sort",
             "price_confidence",
             "calculation_note",
+            "applied_promotion_ids",
+            "applied_coupon_ids",
+            "calculated_at",
         },
     )
 

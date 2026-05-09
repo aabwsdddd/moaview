@@ -1,10 +1,38 @@
 [
   {
-    "id": "promo_spring_wait_free",
+    "id": "promo_kakao_spring_wait_free",
     "platform": "카카오페이지",
+    "promotion_type": "free_episode_event",
     "title": "봄맞이 기다무 확대",
     "description": "fixture 전용 프로모션 데이터입니다.",
+    "free_episode_count": 2,
     "starts_at": "2026-05-01T00:00:00Z",
-    "ends_at": "2026-05-31T23:59:59Z"
+    "ends_at": "2026-05-31T23:59:59Z",
+    "source_url": "https://example.com/kakao/promotions/spring-wait-free",
+    "last_verified_at": "2026-05-01T09:10:00Z"
+  },
+  {
+    "id": "promo_kakao_10_percent_auto",
+    "platform": "카카오페이지",
+    "promotion_type": "instant_discount",
+    "title": "자동 10% 즉시 할인",
+    "description": "모든 사용자가 받는 fixture 자동 즉시 할인입니다.",
+    "discount_percent": 10,
+    "starts_at": "2026-05-01T00:00:00Z",
+    "ends_at": "2026-05-31T23:59:59Z",
+    "source_url": "https://example.com/kakao/promotions/auto-10",
+    "last_verified_at": "2026-05-01T09:10:00Z"
+  },
+  {
+    "id": "promo_ridi_20_cashback",
+    "platform": "리디",
+    "promotion_type": "cashback",
+    "title": "20% 캐시백 체감가",
+    "description": "캐시백은 현금 할인이 아닌 추정 체감가로만 표시합니다.",
+    "cashback_percent": 20,
+    "starts_at": "2026-05-01T00:00:00Z",
+    "ends_at": "2026-05-31T23:59:59Z",
+    "source_url": "https://example.com/ridi/promotions/cashback-20",
+    "last_verified_at": "2026-05-01T10:00:00Z"
   }
 ]

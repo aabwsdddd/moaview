@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 
-from services.api.app.fixtures import load_fixture, search_works
+from services.api.app.fixtures import search_works
 from services.api.app.health import health_payload
+from services.api.app.offers import list_calculated_offers
 
 app = FastAPI(title="MoaView API", version="0.1.0")
 
@@ -29,7 +30,5 @@ def list_works(q: str = "") -> dict[str, object]:
 def list_offers(work_id: str | None = None) -> dict[str, object]:
     """List fixture platform offers, optionally filtered by work."""
 
-    offers = load_fixture("offers")
-    if work_id is not None:
-        offers = [offer for offer in offers if offer["work_id"] == work_id]
+    offers = list_calculated_offers(work_id)
     return {"items": offers, "count": len(offers)}
