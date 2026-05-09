@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 import { DetailViewReporter } from "../../../components/works/DetailViewReporter";
 import { FavoriteButton } from "../../../components/works/FavoriteButton";

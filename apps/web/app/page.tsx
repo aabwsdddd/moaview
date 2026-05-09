@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 import { SearchBox } from "../components/search/SearchBox";
 import { searchWorks } from "../lib/api";

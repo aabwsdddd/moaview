@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { SearchResult } from "../../lib/api";
 import { recordSearchEvent } from "../../lib/api";
 

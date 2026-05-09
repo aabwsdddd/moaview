@@ -1,3 +1,4 @@
+import React from "react";
 import { FavoritesList } from "../../components/favorites/FavoritesList";
 import { listFavorites } from "../../lib/api/favorites";
 

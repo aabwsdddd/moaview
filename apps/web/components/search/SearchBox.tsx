@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import React, { FormEvent, useState } from "react";
 
 export function SearchBox({ initialQuery = "", size = "default" }: { initialQuery?: string; size?: "default" | "hero" }) {
   const router = useRouter();
